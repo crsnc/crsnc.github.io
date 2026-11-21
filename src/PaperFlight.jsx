@@ -4,10 +4,7 @@ const duration = 2420;
 const clamp = value => Math.min(1, Math.max(0, value));
 
 export function shouldShowFlight() {
-  if (window.location.hash || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-  if (new URLSearchParams(window.location.search).get('intro') === '1') return true;
-  try { return !sessionStorage.getItem('acs-flight-seen'); }
-  catch { return true; }
+  return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 function drawPlane(ctx, x, y, angle, size) {
@@ -39,7 +36,6 @@ export default function PaperFlight({onFinish}) {
     const canvas = ref.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) { onFinish(); return; }
-    try { sessionStorage.setItem('acs-flight-seen','1'); } catch { /* Private browsing. */ }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const startY = .39 + Math.random()*.20;
     const bend = Math.random()*Math.PI*2;
