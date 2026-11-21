@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 202 84">
+  <defs>
+    <path id="weave" d="M9 72 34 16Q38 6 44 19L65 72 M23 49H70 C83 49 87 38 86 27 M116 21C104 7 76 9 65 30S62 65 80 70Q99 78 117 61L130 48 M185 18C169 9 145 9 133 22S137 41 158 43S186 57 177 67S143 78 126 64"/>
+    <mask id="ridges"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#weave" stroke="white" stroke-width="14.6"/><use href="#weave" stroke="black" stroke-width="9.3"/><use href="#weave" stroke="white" stroke-width="5.8"/><use href="#weave" stroke="black" stroke-width="1.7"/></g></mask>
+  </defs>
+  <path fill="#2453af" mask="url(#ridges)" d="M0 0h202v84H0z"/>
+</svg>
