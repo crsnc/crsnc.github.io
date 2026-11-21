@@ -148,6 +148,6 @@ function App(){
     )}</dl>
   </section></main>
   <footer id="iletisim"><h2>{t.contact}<span>.</span></h2><a className="email" href={'mailto:'+profile.email}>{profile.email} <Arrow/></a>
-  <div className="end"><Mark/><div><a href={profile.github}>GitHub <Arrow/></a><a href={profile.linkedin}>LinkedIn <Arrow/></a></div><a href="#baslangic" aria-label={t.top}>↑</a></div><p className="signature"><span aria-hidden="true">♥</span> {t.signature}</p></footer>
+  <div className="end"><Mark/><div><a href={profile.github}>GitHub <Arrow/></a><a href={profile.linkedin}>LinkedIn <Arrow/></a></div><a href="#baslangic" aria-label={t.top}>↑</a></div><p className="signature" lang="en">made with <span aria-label="love">♥</span> by <a href="https://www.instagram.com/caansarac/">@caansarac</a></p></footer>
 </>}
 createRoot(document.getElementById('root')).render(<App/>);

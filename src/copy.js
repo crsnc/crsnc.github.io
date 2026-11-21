@@ -6,7 +6,6 @@ export const copy = {
     selected: 'Seçili işler', count: 'PROJE', next: 'Sıradaki proje', soon: ['Çok', 'yakında.'],
     close: 'Kapat', details: 'Detaylar', projectAction: (name, open) => name+' detaylarını '+(open?'kapat':'aç'),
     angle: 'Rölyef açısı', pause: 'Rölyefi duraklat', play: 'Rölyefi oynat', top: 'Başa dön',
-    signature: 'Antalya’da sevgiyle yapıldı.'
   },
   en: {
     language: 'Language', title: 'Portfolio', description: 'Selected web projects by Ahmet Can SARAÇ.',
@@ -15,6 +14,5 @@ export const copy = {
     selected: 'Selected work', count: 'PROJECTS', next: 'Next project', soon: ['Coming', 'soon.'],
     close: 'Close', details: 'Details', projectAction: (name, open) => (open?'Hide':'Show')+' details for '+name,
     angle: 'Relief angle', pause: 'Pause the relief', play: 'Play the relief', top: 'Back to top',
-    signature: 'Made with love in Antalya.'
   }
 };
