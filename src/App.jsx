@@ -1,5 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
+import PaperFlight, {shouldShowFlight} from './PaperFlight';
 import {copy} from './copy';
 import {profile as baseProfile, projects as baseProjects, skills as baseSkills} from './portfolio';
 import {renderRelief} from './art';
@@ -104,6 +105,8 @@ function NameTitle({name}) {
   </h1>;
 }
 function App(){
+  const [flight,setFlight]=useState(shouldShowFlight);
+  const finishFlight=useCallback(()=>setFlight(false),[]);
   const [lang,setLang]=useState(()=>{
     try { return localStorage.getItem('acs-language')==='en'?'en':'tr'; }
     catch { return 'tr'; }
@@ -118,6 +121,7 @@ function App(){
     try { localStorage.setItem('acs-language',lang); } catch { /* Storage can be disabled. */ }
   },[lang,profile.name,t]);
   return <>
+  {flight && <PaperFlight onFinish={finishFlight}/>}
   <a className="skip" href="#isler">{t.skip}</a>
   <header><a className="brand" href="#baslangic" aria-label={profile.name+', '+t.home}><Mark/></a>
   <nav aria-label={t.menu}><a href="#isler">{t.work} <sup>{two(projects.length)}</sup></a><a href="#hakkimda">{t.about}</a><a href="#yetenekler">{t.skills}</a><a href="#iletisim">{t.contact} <Arrow dir="↘"/></a></nav>
@@ -125,7 +129,7 @@ function App(){
     {['tr','en'].map(code=><button key={code} lang={code} aria-label={code==='tr'?'Türkçe':'English'}
       aria-pressed={lang===code} onClick={()=>setLang(code)}>{code.toUpperCase()}</button>)}
   </div></header>
-  <main id="baslangic"><section className="hero" aria-label={t.introduction}>
+  <main id="baslangic"><section className={flight ? "hero flight-active" : "hero"} aria-label={t.introduction}>
     <div className="intro"><NameTitle name={profile.name}/>
     <p>{profile.intro}</p><a className="cta" href="#isler">{t.explore} <Arrow dir="↓"/></a></div>
     <ReliefBackdrop t={t}/></section>
