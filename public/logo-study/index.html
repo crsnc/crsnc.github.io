@@ -1,10 +1,19 @@
 <!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ACS · Logo karşılaştırması</title><link rel="icon" href="../favicon.svg"><style>
 *{box-sizing:border-box}body{margin:0;background:#f6f5ec;color:#262621;font:16px/1.45 system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:clamp(22px,5vw,72px)}h1{font-size:clamp(32px,5vw,66px);letter-spacing:-.07em;margin:0 0 34px}h2{font-size:clamp(19px,2.2vw,30px);letter-spacing:-.05em;margin:0}p{margin:6px 0 12px}.sheet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid;padding-block:22px;gap:22px}.logo{height:145px;display:flex;align-items:center}.logo img{width:min(90%,200px);height:90px;object-fit:contain;object-position:left center}.sizes{display:flex;align-items:center;gap:16px;border-top:1px solid #bfc2be;padding:12px 0}.sizes label{display:flex;align-items:center;gap:6px;font:12px monospace}button{background:transparent;border:1px solid #989ca7;border-radius:30px;padding:8px 12px;color:#193b75;cursor:pointer}button[aria-pressed=true]{color:white;background:#2453af}button:focus-visible{outline:3px solid #2465cc;outline-offset:3px}@media(max-width:650px){.sheet{gap:9px}.sizes{flex-wrap:wrap;gap:6px}.logo{height:90px}.logo img{width:100%}button{padding:7px;font-size:12px}main{padding:16px}h2{font-size:16px}}
 </style></head><body><main><h1>ACS / Logo denemeleri</h1><div class="sheet" id="sheet"></div><p>Her sütunda favicon’u 16 ve 32 pikselde görebilir, tarayıcı sekmesinde deneyebilirsin.</p></main><script>
-const options=[['Köşeli ACS','../acs-mark.svg','../favicon.svg'],['Rölyef ACS','relief.svg','relief-icon.svg'],['Küçük harfli imza','imza.svg','imza-icon.svg']];
+let english=false;
+try {english=localStorage.getItem('acs-language')==='en'} catch {}
+if(english){
+  document.documentElement.lang='en';
+  document.title='ACS · Logo comparison';
+  document.querySelector('h1').textContent='ACS / Logo studies';
+  document.querySelector('main > p').textContent='Compare the favicons at 16 and 32 pixels, then try each one in this browser tab.';
+}
+const testLabel=english?'Try in tab':'Sekmede dene';
+const options=[[english?'Angular ACS':'Köşeli ACS','../acs-mark.svg','../favicon.svg'],[english?'Relief ACS':'Rölyef ACS','relief.svg','relief-icon.svg'],[english?'Lowercase signature':'Küçük harfli imza','imza.svg','imza-icon.svg']];
 for(const [title,logo,icon] of options){
  const panel=document.createElement('section');
- panel.innerHTML='<h2>'+title+'</h2><div class="logo"><img src="'+logo+'" alt="'+title+' logosu"></div><div class="sizes">'+[16,32].map(n=>'<label><img alt="" width="'+n+'" height="'+n+'" src="'+icon+'">'+n+' px</label>').join('')+'</div><button aria-label="'+title+' faviconunu sekmede dene" aria-pressed="'+(icon===options[0][2])+'">Sekmede dene</button>';
+ panel.innerHTML='<h2>'+title+'</h2><div class="logo"><img src="'+logo+'" alt="'+title+(english?' logo':' logosu')+'"></div><div class="sizes">'+[16,32].map(n=>'<label><img alt="" width="'+n+'" height="'+n+'" src="'+icon+'">'+n+' px</label>').join('')+'</div><button aria-label="'+(english?'Try the '+title+' favicon':title+' faviconunu sekmede dene')+'" aria-pressed="'+(icon===options[0][2])+'">'+testLabel+'</button>';
  panel.querySelector('button').onclick=e=>{document.querySelector('link[rel=icon]').href=icon;document.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===e.currentTarget))};document.querySelector('#sheet').append(panel)
 }
 </script></body></html>

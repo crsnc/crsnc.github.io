@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {profile, projects, skills} from './portfolio';
+import {copy} from './copy';
+import {profile as baseProfile, projects as baseProjects, skills as baseSkills} from './portfolio';
 import {renderRelief} from './art';
 import '@fontsource-variable/bricolage-grotesque';
 import './style.css';
@@ -9,7 +10,7 @@ const two = n => String(n).padStart(2,'0');
 const Arrow = ({dir='↗'}) => <span aria-hidden="true">{dir}</span>;
 function Mark(){return <span className="mark" aria-hidden="true"/>}
 
-function ReliefBackdrop(){
+function ReliefBackdrop({t}){
   const [angle,setAngle]=useState(0);
   const [playing,setPlaying]=useState(()=>!window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [dragging,setDragging]=useState(false);
@@ -55,7 +56,7 @@ function ReliefBackdrop(){
     };
   },[angle,playing,dragging]);
   return <>
-    <div className="art-surface" role="slider" tabIndex="0" aria-label="Rölyef açısı" aria-valuemin="0" aria-valuemax="360"
+    <div className="art-surface" role="slider" tabIndex="0" aria-label={t.angle} aria-valuemin="0" aria-valuemax="360"
       aria-valuenow={Math.round((angle*180/Math.PI%360+360)%360)}
       onKeyDown={e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();setAngle(a=>e.key==='Home'?0:e.key==='End'?359*Math.PI/180:a+(e.key==='ArrowLeft'?-.16:.16))}}}
       onPointerDown={e=>{setDragging(true);drag.current={x:e.clientX,angle};e.currentTarget.setPointerCapture(e.pointerId)}}
@@ -64,21 +65,21 @@ function ReliefBackdrop(){
       <canvas ref={canvas} aria-hidden="true"/>
     </div>
     <button className="playback" onClick={()=>setPlaying(value=>!value)}
-      aria-label={playing?'Rölyefi duraklat':'Rölyefi oynat'} title={playing?'Duraklat':'Oynat'}>
+      aria-label={playing?t.pause:t.play} title={playing?t.pause:t.play}>
       {playing?'Ⅱ':'▷'}
     </button>
   </>
 }
-function Project({item,index}){
+function Project({item,index,t}){
   const [expanded,setExpanded]=useState(false);
   const showInterior=expanded && item.detailImage;
   const detailId='project-detail-'+index;
   return <article className={'project '+item.format}>
     <div className="project-stage">
       <button type="button" className="cover" aria-expanded={expanded} aria-controls={detailId}
-        aria-label={item.name+' detaylarını '+(expanded?'kapat':'aç')} onClick={()=>setExpanded(!expanded)}>
+        aria-label={t.projectAction(item.name, expanded)} onClick={()=>setExpanded(!expanded)}>
         <img loading="lazy" key={showInterior ? item.detailImage : item.image} src={import.meta.env.BASE_URL+(showInterior ? item.detailImage : item.image)} alt={showInterior ? item.detailAlt : item.alt}/>
-        <span className="cover-label">{expanded?'Kapat':'Detaylar'} <span aria-hidden="true">{expanded?'−':'+'}</span></span>
+        <span className="cover-label">{expanded?t.close:t.details} <span aria-hidden="true">{expanded?'−':'+'}</span></span>
       </button>
     </div>
     <div className="project-info"><small>{two(index+1)} / {item.category}</small><h3>{item.url ? <a href={item.url} target="_blank" rel="noreferrer">{item.name} <Arrow/></a> : item.name}</h3>
@@ -102,33 +103,51 @@ function NameTitle({name}) {
     </span>
   </h1>;
 }
-function App(){return <>
-  <a className="skip" href="#isler">Projelere geç</a>
-  <header><a className="brand" href="#baslangic" aria-label="Ahmet Can SARAÇ, başlangıç"><Mark/></a>
-  <nav aria-label="Ana menü"><a href="#isler">İşler <sup>{two(projects.length)}</sup></a><a href="#hakkimda">Hakkımda</a><a href="#yetenekler">Yetenekler</a><a href="#iletisim">İletişim <Arrow dir="↘"/></a></nav></header>
-  <main id="baslangic"><section className="hero" aria-label="Tanıtım">
+function App(){
+  const [lang,setLang]=useState(()=>{
+    try { return localStorage.getItem('acs-language')==='en'?'en':'tr'; }
+    catch { return 'tr'; }
+  });
+  const t=copy[lang];
+  const localize=item=>lang==='en' && item.en ? {...item,...item.en} : item;
+  const profile=localize(baseProfile), projects=baseProjects.map(localize), skills=baseSkills.map(localize);
+  useEffect(()=>{
+    document.documentElement.lang=lang;
+    document.title=profile.name+' — '+t.title;
+    document.querySelector('meta[name="description"]').content=t.description;
+    try { localStorage.setItem('acs-language',lang); } catch { /* Storage can be disabled. */ }
+  },[lang,profile.name,t]);
+  return <>
+  <a className="skip" href="#isler">{t.skip}</a>
+  <header><a className="brand" href="#baslangic" aria-label={profile.name+', '+t.home}><Mark/></a>
+  <nav aria-label={t.menu}><a href="#isler">{t.work} <sup>{two(projects.length)}</sup></a><a href="#hakkimda">{t.about}</a><a href="#yetenekler">{t.skills}</a><a href="#iletisim">{t.contact} <Arrow dir="↘"/></a></nav>
+  <div className="language-switch" role="group" aria-label={t.language}>
+    {['tr','en'].map(code=><button key={code} lang={code} aria-label={code==='tr'?'Türkçe':'English'}
+      aria-pressed={lang===code} onClick={()=>setLang(code)}>{code.toUpperCase()}</button>)}
+  </div></header>
+  <main id="baslangic"><section className="hero" aria-label={t.introduction}>
     <div className="intro"><NameTitle name={profile.name}/>
-    <p>{profile.intro}</p><a className="cta" href="#isler">İşleri keşfet <Arrow dir="↓"/></a></div>
-    <ReliefBackdrop/></section>
-  <section className="work" id="isler"><div className="sect-title"><h2>Seçili işler<span>.</span></h2><small>{two(projects.length)} PROJE</small></div>
-    <div className="projects">{projects.map((item,index)=><Project key={item.name} item={item} index={index}/>)}
+    <p>{profile.intro}</p><a className="cta" href="#isler">{t.explore} <Arrow dir="↓"/></a></div>
+    <ReliefBackdrop t={t}/></section>
+  <section className="work" id="isler"><div className="sect-title"><h2>{t.selected}<span>.</span></h2><small>{two(projects.length)} {t.count}</small></div>
+    <div className="projects">{projects.map((item,index)=><Project key={item.name} item={item} index={index} t={t}/>)}
       {projects.length === 3 && <article className="upcoming-project">
-        <small>04 / Sıradaki proje</small>
-        <h3>Çok<br/>yakında.</h3>
+        <small>04 / {t.next}</small>
+        <h3>{t.soon[0]}<br/>{t.soon[1]}</h3>
       </article>}
     </div>
   </section>
   <section id="hakkimda" className="profile-section" aria-labelledby="about-title">
-    <div><h2 id="about-title">Hakkımda<span>.</span></h2><small className="location">{profile.location}</small></div>
+    <div><h2 id="about-title">{t.about}<span>.</span></h2><small className="location">{profile.location}</small></div>
     <div className="bio">{profile.about.map(paragraph=><p key={paragraph}>{paragraph}</p>)}</div>
   </section>
   <section id="yetenekler" className="profile-section" aria-labelledby="skills-title">
-    <h2 id="skills-title">Yetenekler<span>.</span></h2>
+    <h2 id="skills-title">{t.skills}<span>.</span></h2>
     <dl className="skill-index">{skills.map(({group,items})=>
       <div key={group}><dt>{group}</dt><dd><ul>{items.map(item=><li key={item}>{item}</li>)}</ul></dd></div>
     )}</dl>
   </section></main>
-  <footer id="iletisim"><h2>İletişim<span>.</span></h2><a className="email" href={'mailto:'+profile.email}>{profile.email} <Arrow/></a>
-  <div className="end"><Mark/><div><a href={profile.github}>GitHub <Arrow/></a><a href={profile.linkedin}>LinkedIn <Arrow/></a></div><a href="#baslangic" aria-label="Başa dön">↑</a></div></footer>
+  <footer id="iletisim"><h2>{t.contact}<span>.</span></h2><a className="email" href={'mailto:'+profile.email}>{profile.email} <Arrow/></a>
+  <div className="end"><Mark/><div><a href={profile.github}>GitHub <Arrow/></a><a href={profile.linkedin}>LinkedIn <Arrow/></a></div><a href="#baslangic" aria-label={t.top}>↑</a></div><p className="signature"><span aria-hidden="true">♥</span> {t.signature}</p></footer>
 </>}
 createRoot(document.getElementById('root')).render(<App/>);
