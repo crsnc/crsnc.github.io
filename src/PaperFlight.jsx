@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 
-const duration = 1850;
+const duration = 2420;
 const clamp = value => Math.min(1, Math.max(0, value));
 
 export function shouldShowFlight() {
@@ -44,7 +44,7 @@ export default function PaperFlight({onFinish}) {
     const startY = .39 + Math.random()*.20;
     const bend = Math.random()*Math.PI*2;
     const seam = x => startY + .065*Math.sin(x*Math.PI*2 + bend) - .08*x;
-    const fibers = Array.from({length:161}, () => Math.random()*3-1.5);
+    const fibers = Array.from({length:161}, () => Math.random()*9-4.5);
     let frame, width, height;
     function resize() {
       width = canvas.clientWidth;
@@ -66,20 +66,31 @@ export default function PaperFlight({onFinish}) {
         const edgeY = side<0 ? -4 : height+4;
         ctx.beginPath();
         ctx.moveTo(-2,edgeY);
+        const ctxEdge = new Path2D();
         for (let i=0;i<fibers.length;i++) {
           const u=i/(fibers.length-1);
           const delay=clamp((nose-u)/.60);
           const spread=delay*delay*(3-2*delay);
           const y=seam(u)*height+fibers[i]+side*(height*1.1*spread - .8);
-          ctx.lineTo(u*(width+4)-2,y);
+          const x=u*(width+4)-2;
+          ctx.lineTo(x,y);
+          if (i===0) ctxEdge.moveTo(x,y);
+          else ctxEdge.lineTo(x,y);
         }
         ctx.lineTo(width+2,edgeY);
         ctx.closePath();
         ctx.fillStyle=side<0?'#f4f2e9':'#eeede4';
         ctx.fill();
+        ctx.save();
+        ctx.shadowColor='rgba(25, 59, 117, .48)';
+        ctx.shadowBlur=9;
+        ctx.strokeStyle='#9aabc0';
+        ctx.lineWidth=1.4;
+        ctx.stroke(ctxEdge);
+        ctx.restore();
       }
       const angle=Math.atan2((seam(nose+.001)-seam(nose))*height,.001*width);
-      drawPlane(ctx,nose*width,seam(nose)*height,angle,(.26+clamp(nose)*1.1)*Math.min(1.4,width/500));
+      drawPlane(ctx,nose*width,seam(nose)*height,angle,(.26+clamp(nose)*1.1)*Math.min(1.4,Math.max(1.03,width/500)));
       frame=requestAnimationFrame(paint);
     }
     function motionChange() { if (reduced.matches) onFinish(); }

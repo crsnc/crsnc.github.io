@@ -92,15 +92,11 @@ function Project({item,index,t}){
   </article>
 }
 function NameTitle({name}) {
-  const parts = name.split(' ');
-  const surname = parts.pop();
+  const [first, middle, surname] = name.split(' ');
   return <h1 className="name-title" aria-label={name}>
-    <span className="name-stack" aria-hidden="true">
-      {[-1, 0, 1].map(row=><span key={row} style={{'--row':row}}>{name.toLocaleUpperCase('tr-TR')}</span>)}
-    </span>
     <span className="name-final" aria-hidden="true">
-      <span className="given-name">{parts.join(' ')}</span>
-      <span className="surname">{surname}<i>.</i></span>
+      <span className="given-name"><span className="name-piece">{first}</span>{' '}<span className="name-piece">{middle}</span></span>
+      <span className="surname"><span className="name-piece">{surname}<i>.</i></span></span>
     </span>
   </h1>;
 }
